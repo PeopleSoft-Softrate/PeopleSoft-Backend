@@ -23,6 +23,7 @@ router.post("/add", async (req, res) => {
       endDate,
       linkedin,
       internshipType,
+      applicationType,
       resume // Base64 PDF
     } = req.body;
 
@@ -39,6 +40,7 @@ router.post("/add", async (req, res) => {
       endDate,
       linkedin,
       internshipType,
+      applicationType: applicationType || "Internship",
       status: "initial",
     });
 
@@ -58,9 +60,10 @@ router.post("/add", async (req, res) => {
 
       await sendEmail({
         to: process.env.RECIVER_EMAIL_USER,
-        subject: `New Internship Application: ${fullName}`,
+        subject: `New ${applicationType || 'Internship'} Application: ${fullName}`,
         html: `
           <h3>New Application Received</h3>
+          <p><strong>Application Type:</strong> ${applicationType || 'Internship'}</p>
           <p><strong>Full Name:</strong> ${fullName}</p>
           <p><strong>Role Applied For:</strong> ${role}</p>
           <p><strong>College:</strong> ${college}</p>

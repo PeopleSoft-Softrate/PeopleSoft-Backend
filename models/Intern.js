@@ -19,6 +19,7 @@ const InternSchema = new mongoose.Schema({
   endDate: { type: String, default: ""},
   linkedin: { type: String, required: true },
   internshipType: { type: String, default: ""},
+  applicationType: { type: String, enum: ["Internship", "Job"], default: "Internship" },
 
 
 
