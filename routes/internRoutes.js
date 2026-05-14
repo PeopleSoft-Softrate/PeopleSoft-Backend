@@ -26,7 +26,6 @@ router.post("/add", async (req, res) => {
       linkedin,
       internshipType,
       applicationType,
-      resume // Base64 PDF
     } = req.body;
 
     const intern = new Intern({
@@ -48,42 +47,6 @@ router.post("/add", async (req, res) => {
 
     await intern.save();
 
-    // Send Notification Email to HR with the Resume
-    try {
-      const attachments = [];
-      if (resume) {
-        // Remove data:application/pdf;base64, prefix if present
-        const base64Data = resume.replace(/^data:application\/pdf;base64,/, "");
-        attachments.push({
-          filename: `Resume-${fullName.replace(/\s+/g, "_")}.pdf`,
-          content: Buffer.from(base64Data, 'base64'),
-        });
-      }
-
-      await sendEmail({
-        to: process.env.RECIVER_EMAIL_USER,
-        subject: `New ${applicationType || 'Internship'} Application: ${fullName}`,
-        html: `
-          <h3>New Application Received</h3>
-          <p><strong>Application Type:</strong> ${applicationType || 'Internship'}</p>
-          <p><strong>Full Name:</strong> ${fullName}</p>
-          <p><strong>Role Applied For:</strong> ${role}</p>
-          <p><strong>College:</strong> ${college}</p>
-          <p><strong>Department:</strong> ${department}</p>
-          <p><strong>Year:</strong> ${year}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Contact:</strong> ${contact}</p>
-          <p><strong>LinkedIn:</strong> <a href="${linkedin}">${linkedin}</a></p>
-          <br/>
-          <p>The applicant's resume is attached to this email.</p>
-          ${getSignature(LOGO_URL)}
-        `,
-        attachments: attachments,
-      });
-    } catch (emailErr) {
-      console.error("Failed to send application notification email:", emailErr);
-      // We don't fail the request if the email fails, since the data is saved
-    }
 
     res.status(200).json({
       message: "Intern stored successfully",
